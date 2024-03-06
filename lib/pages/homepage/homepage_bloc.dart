@@ -17,15 +17,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<FetchPokemonData>((event, emit) async {
       emit(PokemonDataLoading());
       try {
-        print("Fetching Pokemon data...");
         final pokemonData = await _databaseHelper.getPokemons(event.context);
         emit(PokemonDataLoaded(pokemonData));
-        print("Pokemon Data fetched");
       } catch (error) {
         emit(PokemonDataError(error.toString()));
       }
     });
 
+    on<PokemonSearch>((event, emit) async {
+      emit(PokemonDataLoading());
+      try {
+        final pokemonData = event.searchTerm.isEmpty
+            ? await _databaseHelper.getPokemons(event.context)
+            : await _databaseHelper.getPokemon(event.context, event.searchTerm);
+        emit(PokemonSearchLoaded(pokemonData));
+      } catch (error) {
+        emit(PokemonDataError(error.toString()));
+      }
+    });
     on<DeletePokemon> ( (event, emit) async {
       emit(PokemonDeleting());
       try {
@@ -51,15 +60,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         );
         if (userConfirmed != true) {
           emit(PokemonDeletedCancelled());
-          print("PokemonDeletedCancelled event emitted");
           return;
         }
         await _databaseHelper.deletePokemon(event.context, event.selectedMon);
-        print("selected Mon deleted");
         emit(PokemonDeleted());
-        print("PokemonDeleted event emitted");
         emit(PokemonDataLoaded(await _databaseHelper.getPokemons(event.context)));
-        print("Refresh displayed pokemons");
       } catch (error) {
         emit(PokemonDeleteError(error.toString()));
       }
@@ -68,18 +73,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<EditPokemon>((event, emit) async {
       emit(PokemonEditing());
       try {
-        print("aaaaaaaaaaaaaaaaaa");
         final homeBloc = BlocProvider.of<HomeBloc>(event.context);
-        print("bbbbbbbbbbbbbbbbb");
         await Navigator.push(
           event.context,
           MaterialPageRoute(
             builder: (context) => PokemonForm(addPokemon: false,pokemonToEdit: event.pokemonToEdit),
           ),
         );
-        print("cccccccccccccccccc");
         homeBloc.add(FetchPokemonData(event.context));
-        print("ddddddddddddddddd");
 
 
       } catch (error) {

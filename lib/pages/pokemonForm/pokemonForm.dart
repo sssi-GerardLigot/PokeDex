@@ -113,7 +113,9 @@ class _PokemonFormState extends State<PokemonForm> {
                         }
                       },
                       child: Text(addPokemon == true ? "Save": "Update")),
-                  ElevatedButton(onPressed: () {}, child: const Text("Cancel")),
+                  ElevatedButton(onPressed: () {
+                    Navigator.of(context).pop();
+                  }, child: const Text("Cancel")),
                 ],
               )
             ],

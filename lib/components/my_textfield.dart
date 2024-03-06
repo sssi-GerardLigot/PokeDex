@@ -5,7 +5,7 @@ class MyTextField extends StatelessWidget {
   final String? hintText;
   final Function(String)? onChanged;
   final double height;
-  final String label;
+  final String? label;
 
 
   const MyTextField({
@@ -15,7 +15,7 @@ class MyTextField extends StatelessWidget {
     this.hintText,
     this.onChanged,
     required this.height,
-    required this.label
+    this.label
 
   });
 
@@ -39,7 +39,7 @@ class MyTextField extends StatelessWidget {
         ),
         fillColor: Colors.white,
         filled: true,
-
+        hintText: hintText,
         hintStyle: TextStyle(
           color: Colors.grey[500],
         ),

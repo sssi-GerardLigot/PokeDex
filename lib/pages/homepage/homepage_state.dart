@@ -53,3 +53,8 @@ class PokemonEditError extends HomeState {
 
   PokemonEditError(this.message);
 }
+class PokemonSearchLoaded extends HomeState {
+  final List<Map<String, dynamic>> filteredPokemons;
+  PokemonSearchLoaded(this.filteredPokemons);
+}
+

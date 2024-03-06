@@ -134,7 +134,7 @@ class SQLHelper {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getPokemon(
+  Future<List<Map<String, dynamic>>> getPokemon(
       BuildContext context, String name) async {
     final db = await SQLHelper.db();
     try {

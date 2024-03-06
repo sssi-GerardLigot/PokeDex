@@ -37,4 +37,12 @@ class EditPokemon extends HomeEvent {
   EditPokemon(this.pokemonToEdit, this.context);
 }
 
+class PokemonSearch extends HomeEvent {
+  final String searchTerm;
+  final BuildContext context;
+
+  PokemonSearch(this.searchTerm, this.context);
+}
+
+
 

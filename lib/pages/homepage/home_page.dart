@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pokedex/components/button1.dart';
+import 'package:pokedex/components/my_textfield.dart';
 import 'package:pokedex/components/pokemonCard.dart';
 import 'package:pokedex/pages/homepage/homepage_bloc.dart';
 import 'package:pokedex/pages/homepage/homepage_event.dart';
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
   State<HomePage> createState() => _HomePageState();
+
 }
 
 class _HomePageState extends State<HomePage> {
@@ -31,6 +33,8 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,45 +48,87 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Center(
-          child: BlocListener<HomeBloc, HomeState>(
-        listener: (context, state) {
-          if (state is PokemonDeleted || state is PokemonDataLoaded) {
-            _homeBloc.add(FetchPokemonData(context));
-          }
-        },
-        child: BlocBuilder<HomeBloc, HomeState>(
-            bloc: _homeBloc,
-            builder: (context, state) {
-              if (state is PokemonDataLoading) {
-                return const CircularProgressIndicator();
-              } else if (state is PokemonDataLoaded) {
-                print("BlocBuilder in HomePage is rebuilding");
-                return ListView.builder(
-                    itemCount: state.pokemonData.length,
-                    itemBuilder: (_, index) => Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: PokemonCard(
-                            index: index,
-                            name: state.pokemonData[index]['name'],
-                            type: state.pokemonData[index]['type'],
-                            description: state.pokemonData[index]
-                                ['description'],
-                            edit: () {
-                              context.read<HomeBloc>().add(EditPokemon(state.pokemonData[index], context));
-                            },
-                            delete: () {
-                              context.read<HomeBloc>().add(DeletePokemon(
-                                  state.pokemonData[index]['name'], context));
-                            },
-                          ),
-                        ));
-              } else if (state is PokemonDataError) {
-                return Center(child: Text(state.message));
-              } else {
-                return const SizedBox();
-              }
-            }),
-      )),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: MyTextField(
+                    controller: searchController,
+                    height: 15, hintText: "Search...",
+                  onChanged: (value) {
+                    _homeBloc.add(PokemonSearch(value, context));
+                  },
+                ),
+              ),
+              SizedBox(height: 10,),
+              Expanded(
+                child: BlocListener<HomeBloc, HomeState>(
+                        listener: (context, state) {
+                if (state is PokemonDeleted || state is PokemonDataLoaded) {
+                  _homeBloc.add(FetchPokemonData(context));
+                }
+                        },
+                        child: BlocBuilder<HomeBloc, HomeState>(
+                  bloc: _homeBloc,
+                  builder: (context, state) {
+                    if (state is PokemonDataLoading) {
+                      return const CircularProgressIndicator();
+                    } else if (state is PokemonDataLoaded) {
+                      print("BlocBuilder in HomePage is rebuilding");
+                      return ListView.builder(
+                          itemCount: state.pokemonData.length,
+                          itemBuilder: (_, index) => Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: PokemonCard(
+                                  index: index,
+                                  name: state.pokemonData[index]['name'],
+                                  type: state.pokemonData[index]['type'],
+                                  description: state.pokemonData[index]
+                                      ['description'],
+                                  edit: () {
+                                    context.read<HomeBloc>().add(EditPokemon(state.pokemonData[index], context));
+                                  },
+                                  delete: () {
+                                    context.read<HomeBloc>().add(DeletePokemon(
+                                        state.pokemonData[index]['name'], context));
+                                  },
+                                ),
+                              ));
+                    } else if (state is PokemonSearchLoaded) {
+                      return ListView.builder(
+                        itemCount: state.filteredPokemons.length,
+                          itemBuilder: (_, index) => Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: PokemonCard(
+                              index: index,
+                              name: state.filteredPokemons[index]['name'],
+                              type: state.filteredPokemons[index]['type'],
+                              description: state.filteredPokemons[index]
+                              ['description'],
+                              edit: () {
+                                context.read<HomeBloc>().add(EditPokemon(state.filteredPokemons[index], context));
+                              },
+                              delete: () {
+                                context.read<HomeBloc>().add(DeletePokemon(
+                                    state.filteredPokemons[index]['name'], context));
+                              },
+                            ),
+                          )
+                      );
+
+                    } else if (state is PokemonDataError) {
+                      return Center(child: Text(state.message));
+                    } else {
+                      return const SizedBox();
+                    }
+                  }),
+                      ),
+              ),
+            ],
+          )),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
