@@ -25,20 +25,22 @@ class _PokemonFormState extends State<PokemonForm> {
   TextEditingController nameController = TextEditingController();
   TextEditingController typeController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  late PokemonFormBloc pokemonFormBloc;
 
   @override
   void initState() {
     super.initState();
+    pokemonFormBloc = PokemonFormBloc(SQLHelper());
     if (widget.pokemonToEdit != null) {
       nameController.text = widget.pokemonToEdit!['name'];
       typeController.text = widget.pokemonToEdit!['type'];
       descriptionController.text = widget.pokemonToEdit!['description'];
-
     }
   }
   @override
   Widget build(BuildContext context) {
     bool addPokemon = widget.addPokemon;
+
     return BlocProvider(
       create: (context) => PokemonFormBloc(SQLHelper()),
       child: Scaffold(
@@ -100,7 +102,7 @@ class _PokemonFormState extends State<PokemonForm> {
                           );
                         }else if(widget.addPokemon == false){
                           String selectedMon = widget.pokemonToEdit!['name'];
-                          BlocProvider.of<PokemonFormBloc>(context).add(
+                          pokemonFormBloc.add(
                             PokemonFormSubmitted(
                               context: context,
                               addPokemon: addPokemon,

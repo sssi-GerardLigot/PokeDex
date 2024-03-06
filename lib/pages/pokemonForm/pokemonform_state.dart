@@ -17,6 +17,9 @@ class PokemonFormSuccess extends PokemonFormState {
 
 }
 
+class PokemonFormValidationError extends PokemonFormState {}
+
+
 class PokemonFormFailure extends PokemonFormState {
   final String error;
 

@@ -24,33 +24,28 @@ class PokemonFormBloc extends Bloc<PokemonFormEvent, PokemonFormState> {
                 event.nameController.text,
                 event.typeController.text,
                 event.descriptionController.text);
-            print("add made");
           } else if (event.addPokemon == false) {
-            print("editing: " + event.selectedMon.toString());
             await _databaseHelper.updatePokemon(
                 event.context,
                 event.selectedMon.toString(),
                 event.nameController.text.toString(),
                 event.typeController.text.toString(),
-                event.descriptionController.text.toString());
-            print("edit made");
+                event.descriptionController.text.toString()
+            );
           }
           event.nameController.clear();
           event.typeController.clear();
           event.descriptionController.clear();
-          print("update success");
           Navigator.of(event.context).pop();
           print("Dispatching FetchPokemonData from PokemonFormBloc");
           BlocProvider.of<HomeBloc>(event.context)
               .add(FetchPokemonData(event.context));
           print("Refresh Idol");
-
           emit(PokemonFormSuccess());
         }else{
           ScaffoldMessenger.of(event.context).showSnackBar(
-              const SnackBar(content: Text('All fields are required!'))
+              const SnackBar(content: Text('All fields are required'))
           );
-          emit(PokemonFormLoading());
         }
       } catch (error) {
         emit(PokemonFormFailure(error: error.toString()));
