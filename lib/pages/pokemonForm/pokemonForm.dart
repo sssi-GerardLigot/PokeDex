@@ -38,6 +38,10 @@ class _PokemonFormState extends State<PokemonForm> {
     }
   }
   @override
+  void dispose() {
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     bool addPokemon = widget.addPokemon;
 
@@ -48,7 +52,7 @@ class _PokemonFormState extends State<PokemonForm> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           centerTitle: true,
           title:  Text(addPokemon == true ? "Add Pokemon": "Update Pokemon",
-            style: TextStyle(
+            style: const TextStyle(
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.bold,
                 fontSize: 25),
@@ -90,27 +94,38 @@ class _PokemonFormState extends State<PokemonForm> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        if(widget.addPokemon == true){
-                          BlocProvider.of<PokemonFormBloc>(context).add(
-                            PokemonFormSubmitted(
-                              context: context,
-                              addPokemon: addPokemon,
-                              nameController: nameController,
-                              typeController: typeController,
-                              descriptionController: descriptionController,
-                            ),
-                          );
-                        }else if(widget.addPokemon == false){
-                          String selectedMon = widget.pokemonToEdit!['name'];
-                          pokemonFormBloc.add(
-                            PokemonFormSubmitted(
-                              context: context,
-                              addPokemon: addPokemon,
-                              nameController: nameController,
-                              typeController: typeController,
-                              descriptionController: descriptionController,
-                              selectedMon: selectedMon,
-                            ),
+                        String name = nameController.text;
+                        String type = typeController.text;
+                        String description = descriptionController.text;
+                        if(nameController.text.isNotEmpty &&
+                            typeController.text.isNotEmpty &&
+                            descriptionController.text.isNotEmpty) {
+                          if (widget.addPokemon == true) {
+                            BlocProvider.of<PokemonFormBloc>(context).add(
+                              PokemonFormSubmitted(
+                                context: context,
+                                addPokemon: addPokemon,
+                                name: name,
+                                type: type,
+                                description: description,
+                              ),
+                            );
+                          } else if (widget.addPokemon == false) {
+                            String selectedMon = widget.pokemonToEdit!['name'];
+                            pokemonFormBloc.add(
+                              PokemonFormSubmitted(
+                                context: context,
+                                addPokemon: addPokemon,
+                                name: name,
+                                type: type,
+                                description: description,
+                                selectedMon: selectedMon,
+                              ),
+                            );
+                          }
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('All fields are required!'), duration: Durations.short3,),
                           );
                         }
                       },

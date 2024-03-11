@@ -8,17 +8,18 @@ abstract class HomeEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchPokemonData extends HomeEvent {
-  final BuildContext context;
-  const FetchPokemonData(this.context);
-  @override
-  List<Object> get props => [context];
-
-}
+// class FetchPokemonData extends HomeEvent {
+//   const FetchPokemonData();
+//   @override
+//   List<Object> get props => [];
+//
+// }
 
 class ClearDatabaseTable extends HomeEvent {
   final BuildContext context;
+
   const ClearDatabaseTable(this.context);
+
   @override
   List<Object> get props => [context];
 }
@@ -40,8 +41,16 @@ class EditPokemon extends HomeEvent {
 class PokemonSearch extends HomeEvent {
   final String searchTerm;
   final BuildContext context;
-
   PokemonSearch(this.searchTerm, this.context);
+}
+
+class FetchPokemonEvent extends HomeEvent {
+  final String searchTerm;
+
+  const FetchPokemonEvent({this.searchTerm = ''});
+
+  @override
+  List<Object> get props => [searchTerm];
 }
 
 

@@ -21,7 +21,7 @@ class MyTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       onChanged: onChanged,
       decoration: InputDecoration(
@@ -35,7 +35,6 @@ class MyTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-
         ),
         fillColor: Colors.white,
         filled: true,

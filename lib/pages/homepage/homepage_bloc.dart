@@ -12,29 +12,52 @@ import 'package:pokedex/services/database_helper.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final SQLHelper _databaseHelper;
 
+
   HomeBloc(this._databaseHelper) : super(HomeInitial()) {
 
-    on<FetchPokemonData>((event, emit) async {
-      emit(PokemonDataLoading());
-      try {
-        final pokemonData = await _databaseHelper.getPokemons(event.context);
-        emit(PokemonDataLoaded(pokemonData));
-      } catch (error) {
-        emit(PokemonDataError(error.toString()));
-      }
-    });
+    // on<FetchPokemonEvent>((event, emit) async {
+    //   emit(PokemonDataLoading());
+    //   try {
+    //
+    //     final pokemonData = await _databaseHelper.getPokemons();
+    //     emit(PokemonDataLoaded(pokemonData));
+    //     print("Pokemon Data fetched");
+    //   } catch (error) {
+    //     emit(PokemonDataError(error.toString()));
+    //   }
+    // });
+    //
+    // on<PokemonSearch>((event, emit) async {
+    //   emit(PokemonDataLoading());  // Indicate that a search is in progress
+    //   try {
+    //     final pokemonData = event.searchTerm.isEmpty
+    //         ? await _databaseHelper.getPokemons()
+    //         : await _databaseHelper.getPokemon(event.searchTerm);
+    //     emit(PokemonSearchLoaded(pokemonData));
+    //   } catch (error) {
+    //     emit(PokemonDataError(error.toString()));
+    //   }
+    // });
 
-    on<PokemonSearch>((event, emit) async {
+    on<FetchPokemonEvent>((event, emit) async {
       emit(PokemonDataLoading());
       try {
         final pokemonData = event.searchTerm.isEmpty
-            ? await _databaseHelper.getPokemons(event.context)
-            : await _databaseHelper.getPokemon(event.context, event.searchTerm);
-        emit(PokemonSearchLoaded(pokemonData));
+            ? await _databaseHelper.getPokemons()
+            : await _databaseHelper.getPokemon(event.searchTerm);
+
+        // Emit appropriate state based on searchTerm
+        if (event.searchTerm.isEmpty) {
+          emit(PokemonDataLoaded(pokemonData));
+        } else {
+          emit(PokemonSearchLoaded(pokemonData));
+        }
+
       } catch (error) {
         emit(PokemonDataError(error.toString()));
       }
     });
+
     on<DeletePokemon> ( (event, emit) async {
       emit(PokemonDeleting());
       try {
@@ -62,9 +85,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           emit(PokemonDeletedCancelled());
           return;
         }
-        await _databaseHelper.deletePokemon(event.context, event.selectedMon);
+        await _databaseHelper.deletePokemon(event.selectedMon);
         emit(PokemonDeleted());
-        emit(PokemonDataLoaded(await _databaseHelper.getPokemons(event.context)));
+        emit(PokemonDataLoaded(await _databaseHelper.getPokemons()));
       } catch (error) {
         emit(PokemonDeleteError(error.toString()));
       }
@@ -80,7 +103,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             builder: (context) => PokemonForm(addPokemon: false,pokemonToEdit: event.pokemonToEdit),
           ),
         );
-        homeBloc.add(FetchPokemonData(event.context));
+        homeBloc.add(FetchPokemonEvent());
 
 
       } catch (error) {
@@ -91,9 +114,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ClearDatabaseTable>((event, emit) async {
       emit(DatabaseTableClearing());
       try {
-        await _databaseHelper.clearTable(event.context);
+        await _databaseHelper.clearTable();
         emit(DatabaseTableCleared());
-        BlocProvider.of<HomeBloc>(event.context).add(FetchPokemonData(event.context));
+        BlocProvider.of<HomeBloc>(event.context).add(FetchPokemonEvent());
       } catch (error) {
         emit(DatabaseTableClearError(error.toString()));
       }

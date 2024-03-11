@@ -30,10 +30,9 @@ class SQLHelper {
     );
   }
 
-  static Future<List<Queries>> getQueriesFromXML(BuildContext context) async {
+  static Future<List<Queries>> getQueriesFromXML() async {
     try {
-      String xmlString = await DefaultAssetBundle.of(context)
-          .loadString('assets/data/queries.xml');
+      String xmlString = await rootBundle.loadString('assets/data/queries.xml');
       var raw = xml.XmlDocument.parse(xmlString);
       final queries = raw.findAllElements('queries').map((queryElement) {
         final name = queryElement.getAttribute('name').toString();
@@ -55,9 +54,8 @@ class SQLHelper {
       ) async {
     final db = await SQLHelper.db();
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
-      List<dynamic> pokemon = await getPokemon(context, name);
-
+      List<Queries> queries = await getQueriesFromXML();
+      List<dynamic> pokemon = await getPokemon(name);
       if (pokemon.isEmpty) {
         final addPokemonText =
             queries.firstWhere((query) => query.name == "addPokemon");
@@ -83,9 +81,7 @@ class SQLHelper {
       return;
     }
   }
-
    Future<void> updatePokemon(
-      BuildContext context,
       String selectedMon,
       String name,
       String type,
@@ -93,8 +89,8 @@ class SQLHelper {
       ) async {
     final db = await SQLHelper.db();
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
-      List<dynamic> pokemon = await getPokemon(context, name);
+      List<Queries> queries = await getQueriesFromXML();
+      List<dynamic> pokemon = await getPokemon(name);
       if (pokemon.isEmpty) {
         final updatePokemonText =
             queries.firstWhere((query) => query.name == "updatePokemon");
@@ -109,19 +105,15 @@ class SQLHelper {
       }
     } catch (error) {
       print("Error: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error Updating Pokemon!'), duration: Durations.short1,),
-      );
       return;
     }
   }
 
-   Future<List<Map<String, dynamic>>> getPokemons(
-      BuildContext context) async {
+   Future<List<Map<String, dynamic>>> getPokemons() async {
     final db = await SQLHelper.db();
 
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
+      List<Queries> queries = await getQueriesFromXML();
 
       final getPokemonsText =
           queries.firstWhere((query) => query.name == "getAllPokemons");
@@ -134,11 +126,10 @@ class SQLHelper {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getPokemon(
-      BuildContext context, String name) async {
+  Future<List<Map<String, dynamic>>> getPokemon(String name) async {
     final db = await SQLHelper.db();
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
+      List<Queries> queries = await getQueriesFromXML();
       final getPokemonText =
           queries.firstWhere((query) => query.name == "getPokemon");
       final getPokemonQuery = getPokemonText.text;
@@ -150,31 +141,26 @@ class SQLHelper {
     }
   }
 
-   Future<void> deletePokemon(
-      BuildContext context, String selectedMon) async {
+   Future<void> deletePokemon(String selectedMon) async {
     final db = await SQLHelper.db();
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
+      List<Queries> queries = await getQueriesFromXML();
       final deletePokemonText =
           queries.firstWhere((query) => query.name == "deletePokemon");
       final deletePokemonQuery = deletePokemonText.text;
       List<dynamic> params = [selectedMon];
       await db.rawQuery(deletePokemonQuery, params);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pokemon deleted!'), duration: Durations.short1,),
-      );
+
     } catch (error) {
       print("Error: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pokemon not found!'), duration: Durations.short1,),
-      );
+
     }
   }
 
-  Future<void> clearTable(BuildContext context) async {
+  Future<void> clearTable() async {
     final db = await SQLHelper.db();
     try {
-      List<Queries> queries = await getQueriesFromXML(context);
+      List<Queries> queries = await getQueriesFromXML();
       final clearTableText =
           queries.firstWhere((query) => query.name == "clear");
       final clearTableQuery = clearTableText.text;

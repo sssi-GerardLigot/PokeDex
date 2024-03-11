@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(create: (context) => HomeBloc(SQLHelper())..add(FetchPokemonData(context))), // Initialize HomeBloc
+        BlocProvider<HomeBloc>(create: (context) => HomeBloc(SQLHelper())..add(FetchPokemonEvent())), // Initialize HomeBloc
         BlocProvider<PokemonFormBloc>(create: (context) => PokemonFormBloc(SQLHelper())),
       ],
       child: MaterialApp(
